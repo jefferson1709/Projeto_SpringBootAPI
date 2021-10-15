@@ -1,5 +1,6 @@
 package com.springboot.api;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,18 +12,27 @@ import com.springboot.api.domain.Cidade;
 import com.springboot.api.domain.Cliente;
 import com.springboot.api.domain.Endereco;
 import com.springboot.api.domain.Estado;
+import com.springboot.api.domain.ItemPedido;
+import com.springboot.api.domain.Pagamento;
+import com.springboot.api.domain.PagamentoComBoleto;
+import com.springboot.api.domain.PagamentoComCartao;
+import com.springboot.api.domain.Pedido;
 import com.springboot.api.domain.Produto;
+import com.springboot.api.domain.enums.EstadoPagamento;
 import com.springboot.api.domain.enums.TipoCliente;
 import com.springboot.api.repositories.CategoriaRepository;
 import com.springboot.api.repositories.CidadeRepository;
 import com.springboot.api.repositories.ClienteRepository;
 import com.springboot.api.repositories.EnderecoRepository;
 import com.springboot.api.repositories.EstadoRepository;
+import com.springboot.api.repositories.ItemPedidoRepository;
+import com.springboot.api.repositories.PagamentoRepository;
+import com.springboot.api.repositories.PedidoRepository;
 import com.springboot.api.repositories.ProdutoRepository;
 
 @SpringBootApplication
 public class SpringBootApiApplication implements CommandLineRunner {
-	
+
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 	@Autowired
@@ -35,6 +45,12 @@ public class SpringBootApiApplication implements CommandLineRunner {
 	private ClienteRepository clienteRepository;
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootApiApplication.class, args);
@@ -84,6 +100,35 @@ public class SpringBootApiApplication implements CommandLineRunner {
 		
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("15/10/2021 09:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("15/10/2021 09:35"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("18/10/2021 00:00"), null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+				
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+		
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+		
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+		
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+		
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));		
 	}
 
 }
