@@ -16,12 +16,15 @@ import org.springframework.stereotype.Service;
 import com.springboot.api.domain.Cidade;
 import com.springboot.api.domain.Cliente;
 import com.springboot.api.domain.Endereco;
+import com.springboot.api.domain.enums.Perfil;
 import com.springboot.api.domain.enums.TipoCliente;
 import com.springboot.api.dto.ClienteDTO;
 import com.springboot.api.dto.ClienteNewDTO;
 import com.springboot.api.repositories.CidadeRepository;
 import com.springboot.api.repositories.ClienteRepository;
 import com.springboot.api.repositories.EnderecoRepository;
+import com.springboot.api.security.UserSS;
+import com.springboot.api.services.exceptions.AuthorizationException;
 import com.springboot.api.services.exceptions.DataIntegrityException;
 import com.springboot.api.services.exceptions.ObjectNotFoundException;
 
@@ -37,6 +40,11 @@ public class ClienteService {
 
 	
 	public Cliente buscar(Integer id) {
+		UserSS user = UserService.authenticated();
+		if (user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
