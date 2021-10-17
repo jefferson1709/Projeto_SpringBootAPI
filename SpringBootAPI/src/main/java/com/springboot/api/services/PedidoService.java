@@ -13,7 +13,6 @@ import com.springboot.api.domain.enums.EstadoPagamento;
 import com.springboot.api.repositories.ItemPedidoRepository;
 import com.springboot.api.repositories.PagamentoRepository;
 import com.springboot.api.repositories.PedidoRepository;
-import com.springboot.api.repositories.ProdutoRepository;
 import com.springboot.api.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -25,8 +24,6 @@ public class PedidoService {
 	private BoletoService boletoService;
 	@Autowired
 	private PagamentoRepository pagamentoRepository;
-	@Autowired
-	private ProdutoRepository produtoRepository;
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
 	
