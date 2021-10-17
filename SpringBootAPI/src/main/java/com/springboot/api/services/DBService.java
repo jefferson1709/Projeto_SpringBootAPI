@@ -19,6 +19,7 @@ import com.springboot.api.domain.PagamentoComCartao;
 import com.springboot.api.domain.Pedido;
 import com.springboot.api.domain.Produto;
 import com.springboot.api.domain.enums.EstadoPagamento;
+import com.springboot.api.domain.enums.Perfil;
 import com.springboot.api.domain.enums.TipoCliente;
 import com.springboot.api.repositories.CategoriaRepository;
 import com.springboot.api.repositories.CidadeRepository;
@@ -122,13 +123,20 @@ public class DBService {
 		
 		cli1.getTelefones().addAll(Arrays.asList("123456789", "1234567898"));
 		
+		Cliente cli2 = new Cliente(null, "Jeff", "jeff@teste.com", "31628382740", TipoCliente.PESSOAFISICA, pe.encode("123"));
+		
+		cli2.getTelefones().addAll(Arrays.asList("93883321", "34252625"));
+		cli2.addPerfil(Perfil.ADMIN);
+		
 		Endereco e1 = new Endereco(null, "Rua aprovada", "999", "Apto 333", "Centro", "1234567", cli1, c1);
 		Endereco e2 = new Endereco(null, "Avenida confirmada", "333", "Sala 999", "Lado", "1234568", cli1, c2);
+		Endereco e3 = new Endereco(null, "Rodovia naduvida", "666", null, "Meio", "1234569", cli2, c2);
 		
 		cli1.getEnderecos().addAll(Arrays.asList(e1, e2));
+		cli2.getEnderecos().addAll(Arrays.asList(e3));
 		
-		clienteRepository.saveAll(Arrays.asList(cli1));
-		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		clienteRepository.saveAll(Arrays.asList(cli1, cli2));
+		enderecoRepository.saveAll(Arrays.asList(e1, e2, e3));
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		
